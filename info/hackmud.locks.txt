@@ -1,0 +1,7 @@
+EZ_35:
+  EZ_35: {"open"}
+  digit: [0-9]
+
+c003:
+  c003: {"orange"}
+  c003_triad1

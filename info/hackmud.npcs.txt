@@ -1,0 +1,49 @@
+---- Lua highlighting is recommended.
+
+
+--- T1 ---
+
+
+pica.nubloops
+  archaic.showcase  --{page:"debug"}. use pica to get themes.
+                    -- crowsnest, saloon, graveyard
+
+suborbital_airlines.bulletin {request:"operator_login",user_id:"???"}
+                          --{request:"flight_list",id:"V2776",proceed:"y", dest:"ATL9932"}
+  weathernet.public  {navigation:""}
+  weathernet.status
+
+skimmerite.learn_to_read {go:"teach_me", calibration_classification:"BOYHOWDY", humans_are:"DEAD"}
+  skimmerite.public {entry:"", p:""} --people, news_posts, goals
+  turing_testing.calibration  {nav:"begin_calibration",agree:true,answer1:"D",answer2:"C",answer3:"D",answer4:"E"}
+                              {nav: "data_access", unlock:true}
+                              --real answer is D,E,A,D
+
+  turing_testing.calibration{nav: "data_access", unlock:true, dataset:"baselines"}
+  turing_testing.public {nav: ""} --people, latest, mission
+
+aon.memb3rs_only {join:""}  --UnvarnishedPygmyUmbrella
+  aon.public
+  lowell_extermination.testimonials
+    subject_object.rating_index {page:"rating_finder",product_id:"le_sqrz480",owner_id:"bnnyhunteR",comment_no:"3354511003",continue:true}
+      subject_object.public
+
+vacuum_rescue.responder --use unit.owner_id
+  robovac_idp1p1.d3d2
+    gdflw_control_hub_32a.init
+      gdflw_control_hub_32a.init {item_id:"PY6874",locator:"UD43576",urgency:10,confirm:true}
+      gdflw_control_hub_32a.init{get:"status",delivery_id:"del_366675"}
+vacuum_rescue.public {get:"people", pass:"???"}
+
+goodfellow.public {command:"public_profiles"} --mylogin,
+
+
+
+
+weathernet.public
+skimmerite.public
+goodfellow.public
+aon.public
+subject_object.public
+vacuum_rescue.public
+lowell_extermination.public
