@@ -40,8 +40,8 @@ market.*
 
 --- MACROS ---
 
-/u1=user anon_e16823
-/u2=user henryfbp1
+/u1=user <USER_1>
+/u2=user <USER_2>
 
 /hl=kernel.hardline
 /dc=kernel.hardline{dc:true}
@@ -57,10 +57,10 @@ market.*
 /browset=market.browse{{type:"{0}"}}
 /browse=market.browse{}
 
-/ez_21=henryfbp1.ez_21_c {{t:#s.{0}}}
-/ez_35=henryfbp1.ez_35_c {{t:#s.{0}}}
-/l0cket=henryfbp1.l0cket_c {{t:#s.{0}}}
-/all_lock=henryfbp1.all_lock_c {{t:#s.{0}}}
+/ez_21=<USER_NAME>.ez_21_c {{t:#s.{0}}}
+/ez_35=<USER_NAME>.ez_35_c {{t:#s.{0}}}
+/l0cket=<USER_NAME>.l0cket_c {{t:#s.{0}}}
+/all_lock=<USER_NAME>.all_lock_c {{t:#s.{0}}}
 
 -- skip tutorial commands
 
