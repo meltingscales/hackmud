@@ -1,3 +1,4 @@
 *.lnk
-*password*
-*sensitive*
+*.password
+*.private
+*.sensitive
