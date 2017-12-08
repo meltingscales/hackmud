@@ -2,3 +2,5 @@
 *.password
 *.private
 *.sensitive
+
+.atom-build.yml
