@@ -1,4 +1,4 @@
-function(ctx, args)
+function (ctx, args)
 {
   // https://www.sitepoint.com/shorthand-javascript-techniques/
   // https://medium.com/bits-and-pixels/javascript-shorthand-collection-part-1-203240c826b1
@@ -61,7 +61,7 @@ function(ctx, args)
   fb = b => (b ? _hc(b,'L') : _hc(b,'D') ),
 
   // returns if str a contains str b.
-  contains = (a,b) => ((a.indexOf(b) == -1) ? F : T);
+  _scnt = (a,b) => ((a.indexOf(b) == -1) ? F : T);
 
 /***
   * Returns if str 'a' contains ANY strings in list 'lst'
@@ -71,7 +71,7 @@ function(ctx, args)
     for(let idx in lst)
     {
       pi(`Checking if string '${a}' contains string '${lst[idx]}'...`,v);
-      if(contains(a,lst[idx]))
+      if(_scnt(a,lst[idx]))
       {
         return T;
       }
@@ -195,6 +195,8 @@ var isPrime = n => (len(factors(n)) <= 1);
   hl = `kernel.hardline`,
   _ISM = `is missing.`,
   _DAC = `Denied access by CORE`,
+  // _CCC = `is not the correct complement color.`,
+  _CCC = `complement color.`,
 
   EZ_21 = `EZ_21`,
   EZ_35 = `EZ_35`,
@@ -240,7 +242,7 @@ var isPrime = n => (len(factors(n)) <= 1);
   {
     for(let i in lockNames)
     {
-      if(contains(str,("\`N"+lockNames[i]+"\`"))) //that special formatting.
+      if(_scnt(str,("\`N"+lockNames[i]+"\`"))) //that special formatting.
       {
         return lockNames[i];
       }
@@ -251,7 +253,7 @@ var isPrime = n => (len(factors(n)) <= 1);
 
   function cracked_all_locks(message) //tells you if there's no locks left to crack.
   {
-    if(contains(message, SUPER_UNLOCKED)){return T;} //if it says "conn term'd"
+    if(_scnt(message, SUPER_UNLOCKED)){return T;} //if it says "conn term'd"
   }
 
 
@@ -270,19 +272,20 @@ var isPrime = n => (len(factors(n)) <= 1);
     //weird compound locks.
     //TODO: make this programmatic. this takes up wayyy too much space.
     if(
-        (contains(m,SUPER_UNLOCKED))                                //if it has "Connection terminated."
-       ||(contains(m,_ISM))                                         //if it has "is missing."
-       ||(contains(m,_DAC))                                         //if it has "Denied access by CORE"
-       ||(contains(lt, c001) && contains(m, color_digit))           //that stupid c001...
+         (_scnt(m,SUPER_UNLOCKED))                         //if it has "Connection terminated."
+       ||(_scnt(m,_ISM))                                   //if it has "is missing."
+       ||(_scnt(m,_DAC))                                   //if it has "Denied access by CORE"
+       ||(_scnt(lt, c001) && _scnt(m, color_digit))          //that stupid c001...
 
-       || (contains(lt, c002) && contains(m, c002_complement))     //that stupid c002...
+       || (_scnt(lt, c002) && _scnt(m, c002_complement))     //that stupid c002...
+       || (_scnt(lt, c002_complement) && _scnt(m, c002))     //that stupid c002_complement ==- correct -==> LOCK_UNLOCKED c002
 
-       ||  (contains(lt,c003) && contains(m, c003_triad_1))         //that stupid c003...
-       || (contains(lt,c003_triad_1) && contains(m, c003_triad_2))  //that stupid c003_triad_1...
-       || (contains(lt,c003_triad_2) && contains(m, c003))          //that stupid c003_triad_2 ==- correct -==> LOCK_UNLOCKED c003
+       || (_scnt(lt,c003) && _scnt(m, c003_triad_1))          //that stupid c003...
+       || (_scnt(lt,c003_triad_1) && _scnt(m, c003_triad_2))  //that stupid c003_triad_1...
+       || (_scnt(lt,c003_triad_2) && _scnt(m, c003))          //that stupid c003_triad_2 ==- correct -==> LOCK_UNLOCKED c003
 
-       || (contains(lt, EZ_35) && contains(m, digit))               //that stupid EZ_35...
-       || (contains(lt, digit) && contains(m, EZ_35))               //that stupid digit ==- correct -==> LOCK_UNLOCKED EZ_35
+       || (_scnt(lt, EZ_35) && _scnt(m, digit))               //that stupid EZ_35...
+       || (_scnt(lt, digit) && _scnt(m, EZ_35))               //that stupid digit ==- correct -==> LOCK_UNLOCKED EZ_35
       )
     {
      return T;
@@ -295,14 +298,14 @@ var isPrime = n => (len(factors(n)) <= 1);
 
       // pi(`Examining: '${alert(lockNames[i])}' for '${needle}'...`,v);
 
-      if(contains(m, needle) && contains(needle, lt))
+      if(_scnt(m, needle) && _scnt(needle, lt))
       {//then the lock we're checking...is prefixed by LOCK_UNLOCKED.
         pi(`Message has ${needle}! It is prefixed by ${UNLOCKED}!`,v);
         return T;
       }
     }
 
-    if(contains(m,_STL_LCKD))
+    if(_scnt(m,_STL_LCKD))
     {
       pi(`It is still locked.`,v);
       return F;
@@ -398,7 +401,7 @@ var isPrime = n => (len(factors(n)) <= 1);
 
       p(response);
 
-      if(contains(response,hl)) //we gotta be in hardline
+      if(_scnt(response,hl)) //we gotta be in hardline
       {
         // p(`Must be in hardline.`);
         // return r;
