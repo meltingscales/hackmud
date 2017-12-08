@@ -186,7 +186,7 @@ var isPrime = n => (len(factors(n)) <= 1);
   target_name = `t`, 	 //target var name
 
   oul = spl(`open,unlock,release`),
-  colorlist = spl(`red,orange,yellow,green,blue,indigo,violet,purple,pink,black,white,teal,cyan,brown`),
+  colorlist = spl(`red,pink,brown,orange,yellow,gold,lime,green,teal,cyan,blue,purple,indigo,magenta,violet,silver,gray,grey,black,white`),
   l0cketlist = spl(`op3n,unl0ck,k3y,3nter`),
 
   UNLOCKED = `LOCK_UNLOCKED`,
