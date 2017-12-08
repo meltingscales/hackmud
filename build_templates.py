@@ -29,7 +29,7 @@ fileDict =\
  {
   "info/hackmud.commands.txt":
   {
-   "output":  "info/hackmud.commands.private.txt",
+   "output":  "info/hackmud.commands.private",
    "template": templateFile,
   },
  }
@@ -44,6 +44,7 @@ def sanitize(str, strip=[" "], remove=["\r", "\n"]):
      remove (str[], optional) Additional things to be removed.
     Returns:
      (str) The sanitized string.
+
     """
     for stripme in strip:
         str = str.strip(stripme)
@@ -68,6 +69,18 @@ def readFile(path):
     for line in f:
         ret.append(line)
     return ret
+
+
+def writeFile(path, contents):
+    """Write a string to a file.
+
+    Args:
+     path (str): The path to a file to be written.
+     contents (str): The contents of that file.
+    """
+    f = open(path, "w")
+    f.write(contents)
+    f.close()
 
 
 def parseRules(rules, delim=":"):
@@ -109,7 +122,8 @@ def main():
         parsed = pystache.parse(u""+template)  # pre-parse a template
         filled = pystache.render(parsed, hash)
 
-        print("Formatted template: \n{0}".format(filled))
+        writeFile(value["output"], filled)  # write the file.
+        # print("Formatted template: \n{0}".format(filled))
 
     return
 
