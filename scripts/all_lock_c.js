@@ -272,9 +272,9 @@ var isPrime = n => (len(factors(n)) <= 1);
     //weird compound locks.
     //TODO: make this programmatic. this takes up wayyy too much space.
     if(
-         (_scnt(m,SUPER_UNLOCKED))                         //if it has "Connection terminated."
-       ||(_scnt(m,_ISM))                                   //if it has "is missing."
-       ||(_scnt(m,_DAC))                                   //if it has "Denied access by CORE"
+         (_scnt(m,SUPER_UNLOCKED))                           //if it has "Connection terminated."
+       ||(_scnt(m,_ISM))                                     //if it has "is missing."
+       ||(_scnt(m,_DAC))                                     //if it has "Denied access by CORE"
        ||(_scnt(lt, c001) && _scnt(m, color_digit))          //that stupid c001...
 
        || (_scnt(lt, c002) && _scnt(m, c002_complement))     //that stupid c002...
