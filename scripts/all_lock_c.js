@@ -10,10 +10,17 @@ function (ctx, args)
 
   var
   r = [],	//return array
+  od_ = {}, //list of already-cracked NPC addresses. This exists because if
+            //you call an already-cracked NPC, it exposes you.
 
   T = true,
   F = false,
   N = null,
+
+  // "safe call". only does t.call(a) if dictionary {d} doesn't have the key
+  // {t} inside of it. this is to ensure we don't call an address after cracking
+  // it, which will expose our loc!!!
+  _sc = (t, a, d = od_) => ((t in d) == T) ? "_sc" : (t.call(a)),
 
   //hackmud coloring.
   _hc = (s,c) => (`\`${c}${s}\``),
@@ -27,12 +34,15 @@ function (ctx, args)
   //split string {s} by delim {d}. default for d = `,`.
   spl = (s,d=`,`) => (s.split(d)),
 
+  //sanitize string {s} with formatting {f}. Removes '\r' and '\n' only by default.
+  _sntz = (s,r) => (s.replace((r || (/\r?\n|\r/g)),'')),
+
   // Print.
 	p = t => r.push(t),
 
 
   //print line. returns a line.
-  pl = c => ("+"+(sl((c || "_"),50))+"+"),
+  pl = (c = "_", t = 50, e = "+") => (e + sl(c, t) + e),
 
   // if(b){print(t)}
   pi = (t,b) => ((b == T) ? p(t) : N),
@@ -61,17 +71,28 @@ function (ctx, args)
   fb = b => (b ? _hc(b,'L') : _hc(b,'D') ),
 
   // returns if str a contains str b.
-  _scnt = (a,b) => ((a.indexOf(b) == -1) ? F : T);
+  _scnt = (a, b) => ((a.indexOf(b) == -1) ? F : T);
+
+  // function _scnt(a, b, v=T)
+  // {
+  //   pi(`Is '${b}' inside '${a}'?`,v);
+  //   if(a.indexOf(b) !== -1)
+  //   {
+  //     pi(Alert('It is!'),v);
+  //     return T;
+  //   }
+  //   return F;
+  // }
 
 /***
-  * Returns if str 'a' contains ANY strings in list 'lst'
+  * Returns if str 's' contains ANY strings in list 'lst'
   */
-  function containsL(a, lst, v=F)
+  function containsL(s, lst, v=F)
   {
     for(let idx in lst)
     {
-      pi(`Checking if string '${a}' contains string '${lst[idx]}'...`,v);
-      if(_scnt(a,lst[idx]))
+      pi(`Checking if string '${s}' contains string '${lst[idx]}'...`,v);
+      if(_scnt(s,lst[idx]))
       {
         return T;
       }
@@ -94,20 +115,20 @@ function (ctx, args)
 /***
   *  Returns a list of all numbers that divide evenly into the number.
   */
-  function factors(number)
+  function factors(n)
   {
     let
-    divisors = range(1, (floor(number/2))), //try all divisors
-    factorsL = []; //bucket
+    divs = range(1, (floor(n/2))), //try all divisors
+    facts = []; //bucket
 
-    for(let num in divisors)
+    for(let d in divs)
     {
-      if(Number.isInteger((number / num))) //if divides evenly
+      if(Number.isInteger((n / d))) //if divides evenly
       {
-        factorsL.push(num);
+        facts.push(d);
       }
     }
-    return factorsL;
+    return facts;
   }
 
 /***
@@ -187,20 +208,23 @@ var isPrime = n => (len(factors(n)) <= 1);
 
   oul = spl(`open,unlock,release`),
   colorlist = spl(`red,pink,brown,orange,yellow,gold,lime,green,teal,cyan,blue,purple,indigo,magenta,violet,silver,gray,grey,black,white`),
-  l0cketlist = spl(`op3n,unl0ck,k3y,3nter`),
+
+  l0cketlist = spl(`tvfkyq,xwz7ja,vc2c7q`), //these come from k3y_v1 item descriptions from market.browse. there are 6 in total.
 
   UNLOCKED = `LOCK_UNLOCKED`,
   _STL_LCKD = `LOCK_ERROR`,
   SUPER_UNLOCKED = `Connection terminated.`,
-  hl = `kernel.hardline`,
+  _HL = `kernel.hardline`,
+  _REQ = `required`,
   _ISM = `is missing.`,
   _DAC = `Denied access by CORE`,
   // _CCC = `is not the correct complement color.`,
   _CCC = `complement color.`,
+  _CDC = `color digit checksum v`,//alue
 
   EZ_21 = `EZ_21`,
   EZ_35 = `EZ_35`,
-  EZ_40 = `EZ_35`,
+  EZ_40 = `EZ_40`,
   ez_prime = `ez_prime`,
   l0cket = `l0cket`,
   digit = `digit`,
@@ -219,7 +243,7 @@ var isPrime = n => (len(factors(n)) <= 1);
       EZ_35:              gend(oul),
       EZ_40:              gend(oul),
 
-      ez_prime:           gend(primes(80)), //first 20 primes.
+      ez_prime:           gend(primes(27)), //some primes. won't have primes over 100.
 
       l0cket:             gend(l0cketlist),
 
@@ -261,72 +285,92 @@ var isPrime = n => (len(factors(n)) <= 1);
   {
     let
     m = message,
-    lt = lockType;
+    lt = lockType,
+    ret = F; //watchdog variable. This is so we don't immediately return, for logging purposes.
 
-    // pi(`Checking if this message means ${lt} is unlocked:`,v);
-    pal();
-    pi(message,v);
-    pal();
 
+    // pi(`Passed these args:`,v);
+    // pi(`m: ${m}`,v);
+    // pi(`lt: ${lt}`,v);
 
     //weird compound locks.
     //TODO: make this programmatic. this takes up wayyy too much space.
-    if(
-         (_scnt(m,SUPER_UNLOCKED))                           //if it has "Connection terminated."
-       ||(_scnt(m,_ISM))                                     //if it has "is missing."
-       ||(_scnt(m,_DAC))                                     //if it has "Denied access by CORE"
-       ||(_scnt(lt, c001) && _scnt(m, color_digit))          //that stupid c001...
+    if(!ret && (
+          (_scnt(m,SUPER_UNLOCKED))                             //if it has "Connection terminated."
+       || (_scnt(m,_ISM))                                       //if it has "is missing."
+       || (_scnt(m,_DAC))                                       //if it has "Denied access by CORE"
 
-       || (_scnt(lt, c002) && _scnt(m, c002_complement))     //that stupid c002...
-       || (_scnt(lt, c002_complement) && _scnt(m, c002))     //that stupid c002_complement ==- correct -==> LOCK_UNLOCKED c002
+       || (_scnt(lt, c001) && _scnt(m, color_digit))            //that stupid c001...
 
-       || (_scnt(lt,c003) && _scnt(m, c003_triad_1))          //that stupid c003...
-       || (_scnt(lt,c003_triad_1) && _scnt(m, c003_triad_2))  //that stupid c003_triad_1...
-       || (_scnt(lt,c003_triad_2) && _scnt(m, c003))          //that stupid c003_triad_2 ==- correct -==> LOCK_UNLOCKED c003
+       || (_scnt(lt, c002) && _scnt(m, c002_complement))        //that stupid c002...
+       || (_scnt(lt, c002_complement) && _scnt(m, c002))        //that stupid c002_complement ==- correct -==> LOCK_UNLOCKED c002
 
-       || (_scnt(lt, EZ_35) && _scnt(m, digit))               //that stupid EZ_35...
-       || (_scnt(lt, digit) && _scnt(m, EZ_35))               //that stupid digit ==- correct -==> LOCK_UNLOCKED EZ_35
-      )
+       || (_scnt(lt, c003) && _scnt(m, c003_triad_1))           //that stupid c003...
+       || (_scnt(lt, c003_triad_1) && _scnt(m, c003_triad_2))   //that stupid c003_triad_1...
+       || (_scnt(lt, c003_triad_2) && _scnt(m, c003))           //that stupid c003_triad_2 ==- correct -==> LOCK_UNLOCKED c003
+
+       || (_scnt(lt, EZ_35) && _scnt(m, digit))                 //that stupid EZ_35...
+       || (_scnt(lt, digit) && _scnt(m, EZ_35))                 //that stupid digit ==- correct -==> LOCK_UNLOCKED EZ_35
+
+       || (_scnt(lt, ez_prime) && _scnt(m, EZ_40))              //that stupid ez_40 ==- correct -==> LOCK_UNLOCKED EZ_40
+     ))
     {
-     return T;
+     ret = T;
+    }
+
+    if(
+      (_scnt(lt, color_digit) && _scnt(m, _CDC))           //that stupid "x is not the correct color digit checksum value"..."
+    )
+    {
+      ret = F;
     }
 
 
-    for(let i in lockNames) //
+    for(let i in lockNames)
     {
       let needle = `${UNLOCKED}\` ${lockNames[i]}`;
 
       // pi(`Examining: '${alert(lockNames[i])}' for '${needle}'...`,v);
 
-      if(_scnt(m, needle) && _scnt(needle, lt))
+      if(!ret && (_scnt(m, needle) && _scnt(needle, lt)))
       {//then the lock we're checking...is prefixed by LOCK_UNLOCKED.
         pi(`Message has ${needle}! It is prefixed by ${UNLOCKED}!`,v);
-        return T;
+        ret = T;
       }
     }
 
-    if(_scnt(m,_STL_LCKD))
+    if(!ret && _scnt(m,_STL_LCKD)) //if m has "LOCK_ERROR"
     {
-      pi(`It is still locked.`,v);
-      return F;
+      // pi(`Still locked.`,v);
+      ret = F;
     }
-    pi(`The msg doesn't contain '${_STL_LCKD}'.`,v);
+    else //else, it doesn't say it's still locked.
+    {
+      pi(`\`LThis means the single \`${Alert(lt)}\`L lock was cracked:\``,v);
+    }
 
-    // pi(`We're going to assume it's unlocked.`,v);
+    if(ret) //if we think it's unlocked
+    {
+      pal();
+      pi(message,v);
+      pal();
+    }
 
-    return T;
+
+
+    return ret;
   }
 
-  function crack(target, prev, lockType, lockObj, v=T)
+  function _crackone(target, prev, lockType, lockObj, v=T)
   {//crack one lock. returns the correct key-val pair. also modifies keyDict.
 
-    pi("crack(...):",v);
+    // pi("_crackone(...):",v);
 
-    pi("Prev: ",v);
-    pi(prev,v);
-
-    pi("Lock object: ",v);
-    pi(lockObj,v);
+    // pi("Prev: ",v);
+    // pi(prev,v);
+    //
+    // pi("Lock object: ",v);
+    // pi(lockObj,v);
 
     let
     response = _STL_LCKD, //unconditionally attempt to add a lock param
@@ -335,10 +379,10 @@ var isPrime = n => (len(factors(n)) <= 1);
     leftOff = lockObj.i,
     j = (leftOff < 0 ? 0 : leftOff); //0 or where we left off, if it's > 0.
 
-    pi("Keys from lockObj:",v);
-    pi(keys,v);
-
-    pi(`We left off at this location: ${j}`,v);
+    // pi("Keys from lockObj:",v);
+    // pi(keys,v);
+    //
+    // pi(`We left off at this location: ${j}`,v);
     // pi(`lockObj.l.length = ${lockObj.l.length}`,v)
 
     while(!(cracked_one_lock(response, lockType, v)) && (j < len(lockObj.l)))
@@ -349,15 +393,14 @@ var isPrime = n => (len(factors(n)) <= 1);
       let addOn = {};
       addOn[lockType] = lockObj.l[j]; //try a password
 
-      // pi(`Adding this:`,v);
-      // pi(addOn,v);
+      pi(`Trying this: ${_hc(lockType,'N')} : ${_hc(addOn[lockType],'V')}`,v);
 
       tempArgs = mergeDict(prev, addOn);
 
-      pi("Trying these args: ",v);
-      pi(tempArgs,v);
+      // pi("Trying these args: ",v);
+      // pi(tempArgs,v);
 
-      response = target.call(tempArgs);
+      response = _sc(target, tempArgs);
 
       // pi("Response:",v);
       // pi(response,v);
@@ -381,7 +424,7 @@ var isPrime = n => (len(factors(n)) <= 1);
     // pi("lockDict is now this:",v);
     // pi(lockDict,v);
 
-    // pi("Crack func returning this:",v);
+    // pi("_crackone func returning this:",v);
     // pi(tempArgs,v);
     return tempArgs;
   }
@@ -397,55 +440,58 @@ var isPrime = n => (len(factors(n)) <= 1);
       let
       cArgs = {}, //we use this to store correct lock values
       target = args[target_name], //target
-      response = target.call(cArgs); //invoke their loc to get a response...
+      response = _sc(target, cArgs); //invoke their loc to get a response...
 
       p(response);
 
-      if(_scnt(response,hl)) //we gotta be in hardline
+      if(_scnt(response,_HL)) //we gotta be in hardline
       {
-        // p(`Must be in hardline.`);
-        // return r;
+        p(_HL+" "+_REQ);
+        return r;
       }
 
       let
       x = 0,
-      maxX = 10; //to avoid infinite loops
+      maxX = 15; //to avoid infinite loops
 
       while(!cracked_all_locks(response) && (++x < maxX))
       {
         let locktype = getlocktype(response);
-        p(`We've got a lock type of ${Alert(locktype)}`);
+        p(`\`LWe've got a lock type of \`${Alert(locktype)}`);
 
-        let cArg = crack(target, cArgs, locktype, lockDict[locktype], T); //get correct arg
+        let cArg = _crackone(target, cArgs, locktype, lockDict[locktype], T); //get correct arg
 
         cArgs = mergeDict(cArgs, cArg); //add our arg.
 
         p(alert(`New args:`));
         p(cArgs);
 
-        response = target.call(cArgs); //get next lock type
+        response = _sc(target, cArgs); //get next lock type
 
+        //if we've unlocked it
+        if(_scnt(response, SUPER_UNLOCKED))
+        {
+          od_[target] = SUPER_UNLOCKED; //record that fact
+        }
       }
 
     }
     else //no args or 't' key missing
     {
-      // p(`missing required arg '${target_name}'.`);
-      // p(usage());
-      // return r;
+      p(usage());
     }
 
   }
-  catch (e)
+  catch (e) //print exception information
   {
-    p(`Exception:`);
-    p(e);
+    PAL();
     p(e.message);
     p(e.stack);
+    PAL();
   }
-  finally
+  finally //to allow printing output even with errors
   {
-    return r;
+    return (r.slice(-200)); //last 900
   }
 
   /// END OF MAIN ///
