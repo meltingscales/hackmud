@@ -209,7 +209,7 @@ var isPrime = n => (len(factors(n)) <= 1);
   oul = spl(`open,unlock,release`),
   colorlist = spl(`red,pink,brown,orange,yellow,gold,lime,green,teal,cyan,blue,purple,indigo,magenta,violet,silver,gray,grey,black,white`),
 
-  l0cketlist = spl(`tvfkyq,xwz7ja,vc2c7q`), //these come from k3y_v1 item descriptions from market.browse. there are 6 in total.
+  l0cketlist = spl(`tvfkyq,xwz7ja,vc2c7q,hc3b69,afgny5`), //these come from k3y_v1 item descriptions from market.browse. there are 6 in total.
 
   UNLOCKED = `LOCK_UNLOCKED`,
   _STL_LCKD = `LOCK_ERROR`,
