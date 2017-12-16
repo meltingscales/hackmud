@@ -410,16 +410,14 @@ var isPrime = n => (len(factors(n)) <= 1);
       j++;
     }
 
-    if(j > len(lockObj.l))
+    //if at the end of passwords and have NOT cracked the lock,
+    if((j == len(lockObj.l)) && !cracked_one_lock(response, lockType))
     {
       PAL()
       pi(ALERT("Ran out of passwords to try!"),v);
       PAL();
     }
-    else
-    {
-      pi(alert(`Success for one lock!`,v));
-    }
+
 
 
     // pi("lockDict is now this:",v);
