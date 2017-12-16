@@ -23,6 +23,10 @@ sys.expose*
 	_transactions
 	_access_log {target:""}
 
+sys.*
+  manage      --manage upgrades
+  upgrades    --list upgrades in inventory
+
 sys.write_log
 sys.xfer_gc_from {target:"", amount:""}
 sys.init {confirm: bool}
@@ -54,7 +58,8 @@ market.*
 /say=chats.send{{channel: "{0}", msg: {1}}} --must use double quotes around msg.
 
 /buy=market.buy{{i:"{0}", count:{1}, confirm:true}}
-/browset=market.browse{{type:"{0}"}}
+/browset=market.browse{{type:"{0}"}} --browse a type
+/browsen=market.browse{{name:"{0}"}} --browse a name
 /browse=market.browse{}
 
 /ez_21=<USER_1>.ez_21_c {{t:#s.{0}}}
