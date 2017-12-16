@@ -301,6 +301,7 @@ var isPrime = n => (len(factors(n)) <= 1);
        || (_scnt(m,_DAC))                                       //if it has "Denied access by CORE"
 
        || (_scnt(lt, c001) && _scnt(m, color_digit))            //that stupid c001...
+       || (_scnt(lt, color_digit) && _scnt(m, c001))            //that stupid color_digit ==- correct -==> LOCK_UNLOCKED c001
 
        || (_scnt(lt, c002) && _scnt(m, c002_complement))        //that stupid c002...
        || (_scnt(lt, c002_complement) && _scnt(m, c002))        //that stupid c002_complement ==- correct -==> LOCK_UNLOCKED c002
