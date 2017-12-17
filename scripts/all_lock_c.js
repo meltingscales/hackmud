@@ -109,7 +109,7 @@ function (ctx, args)
   var
   range = (a, b) => (Array(b+1).fill(1).map((a, b) => a-1 + b)), //range func...
 
-  usage = () => (`Usage: me.script1 {${target_name} : #s.me.scrpt}`),
+  usage = () => (`Usage: bob.all_lock_c {${target_name} : #s.anon_1yh3.their_loc_12h2d5}`),
 
   gend = v => ({i: 0, l: v}), //gen a dict entry
 
