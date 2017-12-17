@@ -3,6 +3,12 @@ function (ctx, args)
   // https://www.sitepoint.com/shorthand-javascript-techniques/
   // https://medium.com/bits-and-pixels/javascript-shorthand-collection-part-1-203240c826b1
 
+  /***
+   * This script is a basic T1 lock cracker.
+   * You simply pass it a LOC like so:
+   * bob.all_lock_c {t:#s.anon_1yh3.their_loc_12h2d5}
+   */
+
   // Javascript, 'hackmud'
 
   //  Made by HenryFBP#9408.
